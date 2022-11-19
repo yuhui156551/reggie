@@ -54,6 +54,7 @@ public class LoginCheckFilter implements Filter{
         }
 
         //4-1、判断登录状态，如果已登录，则直接放行
+        //在用户登录的时候会存储他的id在session。没有登录就没有存储这个id,登录的话就会存储到
         if(request.getSession().getAttribute("employee") != null){
             log.info("用户已登录，用户id为：{}",request.getSession().getAttribute("employee"));
 
