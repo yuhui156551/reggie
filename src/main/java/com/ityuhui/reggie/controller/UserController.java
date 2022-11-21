@@ -10,6 +10,7 @@ import com.ityuhui.reggie.utils.ValidateCodeUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpSession;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("/user")
@@ -25,6 +27,8 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+    @Autowired
+    private StringRedisTemplate redisTemplate;
 
     /**
      * 验证码
@@ -44,7 +48,10 @@ public class UserController {
             //调用阿里云API发送短信
             //SMSUtils.sendMessage();
             //将生成的验证码保存
-            session.setAttribute(phone,code); //phone为键，code为值存入
+            //session.setAttribute(phone,code); //phone为键，code为值存入
+
+            //将生成的验证码缓存到Redis中，设置有效期为30s（方便测试）
+            redisTemplate.opsForValue().set(phone,code,30, TimeUnit.SECONDS);
 
             return R.success("验证码发送成功");
         }
@@ -66,7 +73,10 @@ public class UserController {
         //获取验证码
         String code = map.get("code").toString();
         //获取session保存的验证码
-        Object codeInSession = session.getAttribute(phone);
+        //Object codeInSession = session.getAttribute(phone);
+
+        //从Redis获取验证码
+        Object codeInSession = redisTemplate.opsForValue().get(phone);
         //比对
         if(codeInSession != null && codeInSession.equals(code)){
             //判断是否是新用户，若是，则自动完成注册
@@ -81,6 +91,10 @@ public class UserController {
                 userService.save(user);
             }
             session.setAttribute("user",user.getId());//存session一份，防止过滤器拦截
+
+            //如果登陆成功，删除Redis中缓存的验证码
+            redisTemplate.delete(phone);
+
             return R.success(user);
         }
         return R.error("登陆失败");
