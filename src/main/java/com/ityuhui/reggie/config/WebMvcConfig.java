@@ -57,17 +57,19 @@ public class WebMvcConfig extends WebMvcConfigurationSupport {
     }
 
     /**
-     * 扩展mvc框架的消息转换器
+     * 扩展mvc框架的消息转换器：
+     * Spring MVC框架中,将HTTP请求信息转换为一个对象(@RequestBody注解)，将对象输出为HTTP响应信息(@ResponseBody注解)，
+     * 都通过消息转换器HttpMessageConverter来进行不同类型对象转换。
      * @param converters
      */
     @Override
     protected void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
         log.info("扩展消息转换器...");
-        //创建消息转换器对象
+        // 创建消息转换器对象
         MappingJackson2HttpMessageConverter messageConverter = new MappingJackson2HttpMessageConverter();
-        //设置对象转换器，底层使用Jackson将Java对象转为json
+        // 设置对象转换器，底层使用Jackson将Java对象转为json
         messageConverter.setObjectMapper(new JacksonObjectMapper());
-        //将上面的消息转换器对象追加到mvc框架的转换器集合中
+        // 将上面的消息转换器对象追加到mvc框架的转换器集合中
         converters.add(0,messageConverter);
     }
 
