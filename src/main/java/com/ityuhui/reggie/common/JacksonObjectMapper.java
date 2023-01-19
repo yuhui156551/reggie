@@ -21,6 +21,9 @@ import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKN
  * 对象映射器:基于jackson将Java对象转为json，或者将json转为Java对象
  * 将JSON解析为Java对象的过程称为 [从JSON反序列化Java对象]
  * 从Java对象生成JSON的过程称为 [序列化Java对象到JSON]
+ *
+ * 前端发送的数据过于长超过16位时，long的精度为16位，导致精度不准确，例如id为雪花算法的自动生成
+ * 导致前端发出的请求后端的接收的数据精度受到影响，转换为json格式，就解决了这个问题，包括日期型的相关转化。
  */
 public class JacksonObjectMapper extends ObjectMapper {
 
@@ -30,10 +33,10 @@ public class JacksonObjectMapper extends ObjectMapper {
 
     public JacksonObjectMapper() {
         super();
-        //收到未知属性时不报异常
+        // 收到未知属性时不报异常
         this.configure(FAIL_ON_UNKNOWN_PROPERTIES, false);
 
-        //反序列化时，属性不存在的兼容处理
+        // 反序列化时，属性不存在的兼容处理
         this.getDeserializationConfig().withoutFeatures(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 
 
@@ -48,7 +51,7 @@ public class JacksonObjectMapper extends ObjectMapper {
                 .addSerializer(LocalDate.class, new LocalDateSerializer(DateTimeFormatter.ofPattern(DEFAULT_DATE_FORMAT)))
                 .addSerializer(LocalTime.class, new LocalTimeSerializer(DateTimeFormatter.ofPattern(DEFAULT_TIME_FORMAT)));
 
-        //注册功能模块 例如，可以添加自定义序列化器和反序列化器
+        // 注册功能模块 例如，可以添加自定义序列化器和反序列化器
         this.registerModule(simpleModule);
     }
 }
