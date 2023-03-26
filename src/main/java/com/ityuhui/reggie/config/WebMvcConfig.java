@@ -1,18 +1,7 @@
 package com.ityuhui.reggie.config;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalTimeDeserializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
 import com.github.xiaoymin.knife4j.spring.annotations.EnableKnife4j;
 import com.ityuhui.reggie.common.JacksonObjectMapper;
-import com.ityuhui.reggie.entity.Employee;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,14 +17,7 @@ import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
-import java.math.BigInteger;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
-
-import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
 
 @Slf4j
 @Configuration
@@ -60,12 +42,17 @@ public class WebMvcConfig extends WebMvcConfigurationSupport {
      * 扩展mvc框架的消息转换器：
      * Spring MVC框架中,将HTTP请求信息转换为一个对象(@RequestBody注解)，将对象输出为HTTP响应信息(@ResponseBody注解)，
      * 都通过消息转换器HttpMessageConverter来进行不同类型对象转换。
+     *
+     * 既然已经有@requestbody，为什么还需要消息转换器呢？
+     * 虽然使用@RequestBody注解可以将HTTP请求体映射为Java对象，但是在实际开发中，请求体的数据格式可能不止一种，比如JSON、XML、Form表单等。
+     * 此时，就需要使用消息转换器来将请求体的数据格式转换为Java对象。（尤其是这种前后端不分离的项目）
+     * 因此，配置消息转换器可以让Spring MVC应用支持更多的数据格式，并且可以更加灵活地处理HTTP请求体。
      * @param converters
      */
     @Override
     protected void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
         log.info("扩展消息转换器...");
-        // 创建消息转换器对象
+        // 创建专门处理application/json数据的消息转换器对象
         MappingJackson2HttpMessageConverter messageConverter = new MappingJackson2HttpMessageConverter();
         // 设置对象转换器，底层使用Jackson将Java对象转为json
         messageConverter.setObjectMapper(new JacksonObjectMapper());

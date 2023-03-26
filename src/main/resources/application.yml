@@ -37,8 +37,9 @@ spring:
     allow-bean-definition-overriding: true #允许bean定义覆盖
 
   redis:
-    host: localhost
+    host: 192.168.44.100
     port: 6379
+    password: 123321
   cache:
     redis:
       time-to-live: 1800000 #缓存过期时间，30分钟
