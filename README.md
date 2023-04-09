@@ -14,7 +14,7 @@
 ### 一、前台
 
 #### 前台样式
- ![image](https://github.com/yuhui156551/reggie/blob/master/imgs/%E5%89%8D%E5%8F%B0%E6%A0%B7%E5%BC%8F.png)
+ <img src="https://github.com/yuhui156551/reggie/blob/master/imgs/%E5%89%8D%E5%8F%B0%E6%A0%B7%E5%BC%8F.png" width="400px">
 
 ### 二、后台
 #### 1、管理员工
